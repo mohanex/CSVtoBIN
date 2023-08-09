@@ -2,8 +2,18 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <dirent.h>
+#include <stdio.h>
+#include <cstring>
+#include <string.h>
 
 using namespace std;
+
+char* stringToChar(const string& str) {
+    char* charArray = new char[str.length() + 1]; // +1 for null-terminator
+    strcpy(charArray, str.c_str()); // copy the string to char array
+    return charArray;
+}
 
 int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
 {
@@ -20,7 +30,7 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
     
     //Calcul size of file
     fseek(fd, 0L, SEEK_END);
-    int sz = ftell(fd) + 1;
+    int sz = ftell(fd);
 
     /* Seek to the beginning of the file */
     fseek(fd, 0, SEEK_SET);
@@ -49,7 +59,7 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
 
     char val[60000];
     int index = 0;
-    while (strToken != NULL) {
+    while (strToken  != NULL) {
         //printf("%s\n", strToken);
         // On demande le token suivant.
         
@@ -65,18 +75,68 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         //Next
         strToken = strtok(NULL, delimitors);
     }
-    fwrite(val, sizeof(char), index, fs);
+
+    fwrite(val, sizeof(char), index-2, fs);
+
     fclose(fs);
 
     return 0;
 }
 
 int main() {
-    char csvFile[]  = "320x80_ImageTestDeadPixelPcba_1_255.csv";
-    char binaryFile []  = "output.bin";
+    string csvFiles[50];
+    string csvFiles_output[50];
+    int i = 0;
+    string csv_extension = ".csv";
+    string bin_extension = ".bin";
 
-   //convertCSVtoBinary(csvFile, binaryFile);
-    convertCSVtoBinaryND(csvFile, binaryFile);
+    DIR* di;
+    char* ptr1, * ptr2;
+    int retn;
+    struct dirent* dir;
+    di = opendir("."); //specify the directory name
+    if (di)
+    {
+        while ((dir = readdir(di)) != NULL)
+        {
+            ptr1 = strtok(dir->d_name, ".");
+            ptr2 = strtok(NULL, ".");
+            if (ptr2 != NULL)
+            {
+                retn = strcmp(ptr2, "csv");
+                if (retn == 0)
+                {
+                    csvFiles[i] = ptr1+ csv_extension;
+                    csvFiles_output[i] = ptr1 + bin_extension;
+                }
+            }
+            i++;
+        }
+        closedir(di);
+    }
+    printf("chrobodom\n\r"); 
+    for (int i = 2; i < 34; i++)
+        std::cout << csvFiles[i] << "\n";
+    printf("chrobodom2\n");
 
+    for (int j = 2; j < 35; j++)
+    {
+        string temp_str = csvFiles[j];
+        string temp_str_out = csvFiles_output[j];
+
+
+        /*Converting String to char*/
+        int length = temp_str.length();
+        char* char_array = new char[length + 1];
+        strcpy(char_array, temp_str.c_str());
+
+        length = temp_str_out.length();
+        char* char_array_output = new char[length + 1];
+        strcpy(char_array_output, temp_str_out.c_str());
+
+
+
+        convertCSVtoBinaryND(char_array, char_array_output);
+    }
     return 0;
 }
