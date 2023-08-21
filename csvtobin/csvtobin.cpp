@@ -51,7 +51,7 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         return -3;
     }
     
-    char val[60000];
+    char* val2 = (char*)malloc(60000 * sizeof(char));
     int index = 0;
     while (strToken  != NULL) {
         //printf("%s\n", strToken);
@@ -61,8 +61,8 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         if (strToken != NULL)
         {
              //convertion en bianire
-           val[index] = atoi(strToken);
-           printf("\nIndex : %d, Valeur : 0x%2x", index, val[index]);
+            val2[index] = atoi(strToken);
+           printf("\nIndex : %d, Valeur : 0x%2x", index, val2[index]);
            index++;
         }
 
@@ -70,9 +70,10 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         strToken = strtok(NULL, delimitors);
     }
 
-    fwrite(val, sizeof(char), index-1, fs);
+    fwrite(val2, sizeof(char), index-1, fs);
 
     fclose(fs);
+    free(val2);
 
     return 0;
 }
@@ -110,6 +111,7 @@ int main() {
     }
     for (int i = 0; i < 32; i++) {
         csvFiles[i] = csvFiles[i + 2];
+        csvFiles_output[i] = csvFiles_output[i + 2];
         std::cout << csvFiles[i] << "\n";
     }
 
