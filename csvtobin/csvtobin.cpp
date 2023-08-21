@@ -9,12 +9,6 @@
 
 using namespace std;
 
-char* stringToChar(const string& str) {
-    char* charArray = new char[str.length() + 1]; // +1 for null-terminator
-    strcpy(charArray, str.c_str()); // copy the string to char array
-    return charArray;
-}
-
 int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
 {
     FILE* fd = NULL;
@@ -56,7 +50,7 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         printf("\nErreur : impossible d'ouvrir le ficier de sortie");
         return -3;
     }
-
+    
     char val[60000];
     int index = 0;
     while (strToken  != NULL) {
@@ -76,7 +70,7 @@ int convertCSVtoBinaryND(char* csvFile, char* binaryFile)
         strToken = strtok(NULL, delimitors);
     }
 
-    fwrite(val, sizeof(char), index-2, fs);
+    fwrite(val, sizeof(char), index-1, fs);
 
     fclose(fs);
 
@@ -91,7 +85,7 @@ int main() {
     string bin_extension = ".bin";
 
     DIR* di;
-    char* ptr1, * ptr2;
+    char* ptr1, *ptr2;
     int retn;
     struct dirent* dir;
     di = opendir("."); //specify the directory name
@@ -114,18 +108,18 @@ int main() {
         }
         closedir(di);
     }
-    printf("chrobodom\n\r"); 
-    for (int i = 2; i < 34; i++)
+    for (int i = 0; i < 32; i++) {
+        csvFiles[i] = csvFiles[i + 2];
         std::cout << csvFiles[i] << "\n";
-    printf("chrobodom2\n");
+    }
 
-    for (int j = 2; j < 35; j++)
+    for (int j = 0; j < 32; j++)
     {
         string temp_str = csvFiles[j];
         string temp_str_out = csvFiles_output[j];
 
-
-        /*Converting String to char*/
+        
+        //Converting String to char
         int length = temp_str.length();
         char* char_array = new char[length + 1];
         strcpy(char_array, temp_str.c_str());
@@ -133,7 +127,7 @@ int main() {
         length = temp_str_out.length();
         char* char_array_output = new char[length + 1];
         strcpy(char_array_output, temp_str_out.c_str());
-
+        //remove(char_array_output);
 
 
         convertCSVtoBinaryND(char_array, char_array_output);
